@@ -1,0 +1,27 @@
+{
+	"classMaster": true,
+	"timeTable": {
+		"Communication Engineering": {
+			"Mon": ["1000 : 1100"],
+			"Wed": ["1300 : 1400", "1600 : 1800"],
+			"Fri": ["1300 : 1400"]
+		},
+		"Digital Signal Processing": {
+			"Mon": ["1200 : 1300"],
+			"Wed": ["1100 : 1200"],
+			"Thu": ["1000 : 1200", "1400 : 1500"]
+		},
+		"MicroProcessor Architecture": {
+			"Mon": ["1600 : 1800"],
+			"Tue": ["1300 : 1400"],
+			"Wed": ["1400 : 1500"],
+			"Fri": ["1500 : 1600"]
+		},
+		"Electronic Design Workshop": {
+			"Tue": ["1600 : 1800"],
+			"Wed": ["1000 : 1100"],
+			"Thu": ["1500 : 1600", "1600 : 1800"],
+			"Fri": ["1600 : 1800"]
+		}
+	}
+}
