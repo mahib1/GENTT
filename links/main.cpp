@@ -1,7 +1,6 @@
 #include <cstdint>
 #include <string>
-#include <vector>
-#include "../headers/types.hpp"
+#include "../headers/classes.hpp"
 
 #define ERROR_CONVERT_IDX 96
 
@@ -19,7 +18,8 @@ int main(int argc, char *argv[]) {
   printf("the index of time %s is : %d\n", time1.c_str(), idx);
 
   printf("The Time associated with index %d is : %s", idx,
-         t1.IdxToTime(idx).c_str());
+         t1.IdxToTime(idx));
+
 
   return 0;
 }

@@ -49,7 +49,7 @@ public:
 
 template <class K, class V>
 class HashTable {
-private:
+public:
     struct bucket_t {
         K key;
         V val;
@@ -59,6 +59,7 @@ private:
         bucket_t(const K& key, const V& val) : key(key), val(val), isOccupied(true) {}
     };
 
+private:
     bucket_t* _table;
     size_t _size;
     size_t _cap;
@@ -68,6 +69,7 @@ private:
     void resize();
 
 public:
+
     HashTable(size_t initialCap = 16, float loadFactor = 0.7);
     ~HashTable();
 
