@@ -1,9 +1,20 @@
 #pragma once
 
+#include <cstdint>
 #include <stdint.h>
 #include <string>
 #include <variant>
 #include <vector>
+
+struct Time {
+  uint8_t TimeToIdx(const std::string &time1) const noexcept;
+  std::string IdxToTime(uint8_t idx) const noexcept;
+};
+
+typedef enum {
+  WORK, 
+  FREE
+} cat_t;
 
 typedef enum {
   mon = 0,
@@ -99,3 +110,4 @@ public:
 };
 
 using act_t = std::variant<uniCourse_t, break_t, sleep_t, mand_t, none_t>;
+
