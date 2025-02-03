@@ -1,7 +1,7 @@
 #pragma once
 
 #include "String.hpp"
-#include "unordered_set.hpp"
+#include <unordered_set>
 #include <cstdint>
 #include <variant>
 #include <vector>
@@ -92,7 +92,7 @@ struct Time {
 
 class StringHasher {
 private:
-  static u_set<uint16_t> genIDs;
+  static std::unordered_set<uint16_t> genIDs;
 
   static uint16_t hashNameToId(const String &courseName) {
     uint32_t hash1 = 5381;
@@ -111,7 +111,7 @@ private:
   }
 
   static bool isOccupied(uint16_t index) {
-    return (genIDs.find(index) != nullptr);
+    return (genIDs.find(index) != genIDs.end());
   }
 
 public:
@@ -160,7 +160,7 @@ struct None_t {
   String name = "None";
 };
 
-typedef struct WORK {
+struct WORK {
   uint16_t ID = 0;
   std::variant<UniCourse_t, Mand_t> work_t;
   String tag = "Work";
