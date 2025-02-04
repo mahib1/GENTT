@@ -60,20 +60,17 @@ struct Time {
     std::string s_hrs = std::to_string(hrs);
     if (s_hrs.length() != 2) {
       switch (hrs) {
-      case 0:
-        s_hrs = "00";
+        case 10:
+          s_hrs = "10";
 
-      case 10:
-        s_hrs = "10";
+        case 20:
+          s_hrs = "20";
 
-      case 20:
-        s_hrs = "20";
-
-      default:
-        s_hrs = "no"; // never to run
+        default:
+          s_hrs = "no"; 
       }
 
-      if (hrs < 10 && hrs != 0) {
+      if (hrs < 10) {
         s_hrs = "0" + std::to_string(hrs);
       }
     }
@@ -84,9 +81,9 @@ struct Time {
     if (mins == 30)
       s_mins = "30";
 
-    const char* t = (s_hrs + s_mins).c_str();
-
-    return t;
+    static std::string timeStr;
+    timeStr = s_hrs + s_mins;
+    return timeStr.c_str();
   }
 };
 
@@ -183,6 +180,32 @@ class Activity_t {
   std::pair<uint8_t, uint8_t> _sched;
 
 public:
+
+  void printInfo() const {
+    if (ha(WORK)(actInfo)) {
+      const WORK &work = std::get<WORK>(actInfo);
+      if (ha(UniCourse_t)(work.work_t)) {
+        const UniCourse_t &course = std::get<UniCourse_t>(work.work_t);
+        printf("Course: %s\n", course.courseName.get());
+      } else if (ha(Mand_t)(work.work_t)) {
+        const Mand_t &task = std::get<Mand_t>(work.work_t);
+        printf("Task: %s\n", task.taskName.get());
+      }
+    } else if (ha(SLEEP)(actInfo)) {
+      const SLEEP &sleep = std::get<SLEEP>(actInfo);
+      printf("%s\n", sleep.sleep_t.name.get());
+    } else if (ha(FREE)(actInfo)) {
+      const FREE &freeTime = std::get<FREE>(actInfo);
+      if (ha(Break_t)(freeTime.free_t)) {
+        const Break_t &breakTime = std::get<Break_t>(freeTime.free_t);
+        printf("%s\n", breakTime.name.get());
+      } else if (ha(None_t)(freeTime.free_t)) {
+        const None_t &none = std::get<None_t>(freeTime.free_t);
+        printf("%s\n", none.name.get());
+      }
+    }
+  }
+
   void debugActivity() {
     uint8_t start = _sched.first;
     uint8_t end = _sched.second;
@@ -215,10 +238,70 @@ public:
 
   std::pair<uint8_t, uint8_t> getSchedule() { return _sched; }
   std::variant<WORK, SLEEP, FREE> getActivityInfo() {return actInfo; }
+template <class _Tp, 
+            typename = std::enable_if_t<
+              std::is_same_v<std::decay_t<_Tp>, WORK> ||
+              std::is_same_v<std::decay_t<_Tp>, SLEEP> ||
+              std::is_same_v<std::decay_t<_Tp>, FREE>
+            >>
+  Activity_t(_Tp act, uint8_t st, uint8_t end) 
+    : actInfo(std::move(act)), _sched({st, end})
+  {
+  }
 
-  template <typename _Tp>
-  Activity_t(_Tp act, uint8_t st, uint8_t end) : actInfo(act) {
-    _sched = {st, end};
+  void setEnd(uint8_t end) {
+    _sched.second = end;
+  }
+
+  void setStart(uint8_t start) {
+    _sched.first = start;
+  }
+
+  bool operator==(const Activity_t &other) const {
+    if (this->_sched != other._sched) {
+      return false;
+    }
+
+    if (this->actInfo.index() != other.actInfo.index()) {
+      return false;
+    }
+
+    if (ha(WORK)(this->actInfo)) {
+      const WORK &thisWork = std::get<WORK>(this->actInfo);
+      const WORK &otherWork = std::get<WORK>(other.actInfo);
+      
+      //this should work
+      if (ha(UniCourse_t)(thisWork.work_t) && ha(UniCourse_t)(otherWork.work_t)) {
+        return std::get<UniCourse_t>(thisWork.work_t).courseID ==
+               std::get<UniCourse_t>(otherWork.work_t).courseID;
+      }
+
+      //this should work too 
+      if (ha(Mand_t)(thisWork.work_t) && ha(Mand_t)(otherWork.work_t)) {
+        return std::get<Mand_t>(thisWork.work_t).taskID ==
+               std::get<Mand_t>(otherWork.work_t).taskID;
+      }
+
+      return false;
+    }
+
+    //this should work too 
+    if (ha(SLEEP)(this->actInfo) && ha(SLEEP)(other.actInfo)) {
+      return true; // Sleep is the same for all instances
+    }
+
+
+    if (ha(FREE)(this->actInfo) && ha(FREE)(other.actInfo)) {
+      const FREE& thisFree = std::get<FREE>((this -> actInfo));
+      const FREE& otherFree = std::get<FREE>(other.actInfo);
+
+      if(ha(None_t)(thisFree.free_t) && ha(None_t)(otherFree.free_t)) return true;
+      if(ha(Break_t)(thisFree.free_t) && ha(Break_t)(otherFree.free_t)) return true;
+
+      return false;
+    }
+
+    return false;
   }
 };
 
@@ -227,44 +310,71 @@ class TimeTable_t {
 
 public:
   TimeTable_t() {
-    for (int i = 0; i < 96; i++) {
-      _timeArray.push_back(0);
+    // Create a default activity covering the full day.
+    Activity_t* defaultActivity = new Activity_t {FREE{None_t{}}, 0, SIZE - 1};
+
+    // Resize the vector and fill all slots with the default activity.
+    _timeArray.resize(SIZE, defaultActivity);
+
+    // Optionally, you can still call insert(defaultActivity) if needed,
+    // but now every slot is already a valid pointer.
+    // insert(defaultActivity);
+  }
+
+  void insert(Activity_t* act) noexcept {
+    auto [start, end] = act -> getSchedule();
+    for(uint8_t i = start; i <= end; i++) {
+      if(isOverridable(i)) {
+        _timeArray[i] = act;
+      }
+    }
+  }
+
+  void merge() {
+    for(uint8_t i = 0; i < _timeArray.size() - 1; i++) {
+      if(_timeArray[i] == _timeArray[i + 1]) {
+        _timeArray[i] -> setEnd(i+1);
+      }
     }
   }
 
   void debug() {
-    int st = 0, et = 0;
-    int K = 8;
-
-    for (int i = 0; i < _timeArray.size(); i++) {
-      if (_timeArray[i] != nullptr) {
-        if (i > 0 && _timeArray[i] == _timeArray[i - 1]) {
-          et = i;
-        } else {
-          if (i > 0 && et - st >= K) {
-            _timeArray[st]->debugActivity();
-          }
-          st = et = i;
-        }
+    // Group contiguous slots that point to the same activity.
+    uint8_t groupStart = 0;
+    Activity_t* currentAct = _timeArray[0];
+    
+    for (uint8_t i = 1; i < _timeArray.size(); i++) {
+      // When the pointer changes, print the group.
+      if (_timeArray[i] != currentAct) {
+        const char* startTime = Time::IdxToTime(groupStart);
+        const char* endTime = Time::IdxToTime(i - 1);
+        printf("%s to %s -> ", startTime, endTime);
+        printf("%d, %d\n", groupStart, i - 1);
+        printf("%s", Time::IdxToTime(groupStart));
+        printf(" to %s -> ", Time::IdxToTime(i-1));
+        currentAct->printInfo();
+        currentAct = _timeArray[i];
+        groupStart = i;
       }
     }
-
-    if (et - st >= K) {
-      _timeArray[st]->debugActivity();
-    }
+    
+    // Print the last group.
+    printf("%s to %s -> ", Time::IdxToTime(groupStart), Time::IdxToTime(_timeArray.size() - 1));
+    currentAct->printInfo();
   }
-
-  void insert(Activity_t* act1) {
-    auto [start, end] = act1 -> getSchedule();
-    for(int i = start; i < end; i++) {
-      auto info = _timeArray[i] -> getActivityInfo();
-      if(ha(FREE)(info)) {
-        const FREE freeTime = std::get<FREE>(info);
-
-        if(ha(None_t)(freeTime.free_t)) {
-          _timeArray[i] = act1;     
-        }
+  
+  //checks if the activity can be overridden
+  bool isOverridable(uint8_t idx) {
+    act_t activity = _timeArray[idx] -> getActivityInfo();
+    if(ha(FREE)(activity)) {
+      const FREE& free1 = std::get<FREE>(activity);
+      
+      if(ha(None_t)(free1.free_t)) {
+        return true;
       }
+
+      return false;
     }
-  }
+    return false;
+  } 
 };

@@ -1,6 +1,4 @@
 #include "../headers/classes.hpp"
-#include <iostream>
-#include <memory>
 
 // Assuming necessary headers and namespaces are already included
 
@@ -57,6 +55,11 @@ int main() {
 
   None_t n1;
   printf("%s\n", n1.name.get());
+
+  // printf("The times are : \n");
+  // for(uint8_t i = 0; i < 96; i++) {
+  //   printf("%d -> %s\n", i, Time::IdxToTime(i));
+  // }
 
   return 0;
 }
