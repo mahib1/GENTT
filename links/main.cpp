@@ -1,4 +1,5 @@
 #include "../headers/classes2.hpp"
+#include <iostream>
 
 // Assuming necessary headers and namespaces are already included
 
@@ -11,7 +12,7 @@ int main() {
   String sleepName = "Sleep";
 
   // Create instances of structures
-  UniCourse_t course = {
+  uniCourse_t course = {
       courseName,
       {},
       2,
@@ -61,5 +62,6 @@ int main() {
   //   printf("%d -> %s\n", i, Time::IdxToTime(i));
   // }
 
+  std::cin.get();
   return 0;
 }
