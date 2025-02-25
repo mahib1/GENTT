@@ -108,8 +108,8 @@ uint16_t StringHasher::getIdForCourse(const String &courseName) {
 void Activity_t::printInfo() const {
   if (ha(WORK)(actInfo)) {
     const WORK &work = std::get<WORK>(actInfo);
-    if (ha(UniCourse_t)(work.work_t)) {
-      const UniCourse_t &course = std::get<UniCourse_t>(work.work_t);
+    if (ha(uniCourse_t)(work.work_t)) {
+      const uniCourse_t &course = std::get<uniCourse_t>(work.work_t);
       printf("Course: %s\n", course.courseName.get());
     } else if (ha(Mand_t)(work.work_t)) {
       const Mand_t &task = std::get<Mand_t>(work.work_t);
@@ -138,8 +138,8 @@ void Activity_t::debugActivity() {
 
   if (ha(WORK)(actInfo)) {
     const WORK &work = std::get<WORK>(actInfo);
-    if (ha(UniCourse_t)(work.work_t)) {
-      const UniCourse_t &course = std::get<UniCourse_t>(work.work_t);
+    if (ha(uniCourse_t)(work.work_t)) {
+      const uniCourse_t &course = std::get<uniCourse_t>(work.work_t);
       printf("Course: %s\n", course.courseName.get());
     } else if (ha(Mand_t)(work.work_t)) {
       const Mand_t &task = std::get<Mand_t>(work.work_t);

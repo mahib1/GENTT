@@ -14,7 +14,7 @@ int main() {
   // Create instances of structures
   uniCourse_t course = {
       courseName,
-      {},
+      {{{0, 4}, {6, 8}}},
       2,
       1,
       1}; // courseName, schedule, lecHrs, assignments, courseID
@@ -26,8 +26,8 @@ int main() {
   printf("no error till line %d\n", __LINE__);
 
   // Wrap them into WORK, SLEEP, or FREE
-  WORK workCourse = {0, course};           // Wrapping course as WORK
-  WORK workTask = {0, task};               // Wrapping task as WORK
+  WORK workCourse = {.work_t = course};           // Wrapping course as WORK
+  WORK workTask = {.work_t = task};               // Wrapping task as WORK
   SLEEP sleepStruct = {sleep};             // Wrapping sleep as SLEEP
   FREE freeBreak = {breakTime, 2, "Free"}; // Wrapping break as FREE
   FREE freeNone = {none, 2, "Free"};       // Wrapping none as FREE
@@ -35,7 +35,7 @@ int main() {
   printf("no error till line %d\n", __LINE__);
 
   // Create activities by passing the wrapped objects
-  Activity_t courseActivity(workCourse, 0, 3);
+  Activity_t courseActivity(workCourse, 0, 4);
   Activity_t taskActivity(workTask, 4, 6);    
   Activity_t sleepActivity(sleepStruct, 7, 8);
   Activity_t breakActivity(freeBreak, 9, 10); 
@@ -44,23 +44,31 @@ int main() {
 
   // Create a timetable and insert activities
   TimeTable_t timeTable;
+  timeTable.debug();
+  printf("Time Table init\n");
   timeTable.insert(&courseActivity);
+  printf("Course insert\n");
   timeTable.insert(&taskActivity);
-  timeTable.insert(&sleepActivity);
+  printf("task insert\n");
   timeTable.insert(&breakActivity);
+  printf("break insert\n");
   timeTable.insert(&noneActivity);
   printf("Reached here!\n");
 
   // Debug the timetable to print the scheduled activities
-  timeTable.debug();
+  // timeTable.debug();
 
-  None_t n1;
-  printf("%s\n", n1.name.get());
+  // None_t n1;
+  // printf("%s\n", n1.name.get());
 
   // printf("The times are : \n");
   // for(uint8_t i = 0; i < 96; i++) {
   //   printf("%d -> %s\n", i, Time::IdxToTime(i));
   // }
+
+  //this is not workin rn
+  timeTable.debug();
+  // timeTable.devDebug();
 
   std::cin.get();
   return 0;
