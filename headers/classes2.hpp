@@ -419,7 +419,7 @@ TimeTable_t::~TimeTable_t() {
   for(int i = 0; i < _timeArray.size(); i++) {
     Activity_t* act = _timeArray[i]; 
     if(act == nullptr) continue;
-    free(act);
+    delete act;
   }
 }
 
