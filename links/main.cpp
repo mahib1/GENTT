@@ -68,7 +68,7 @@ int main() {
 
   //this is not workin rn
   timeTable.debug();
-  // timeTable.devDebug();
+  timeTable.devDebug();
 
   std::cin.get();
   return 0;
