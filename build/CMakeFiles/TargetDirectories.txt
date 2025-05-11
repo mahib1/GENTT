@@ -1,0 +1,3 @@
+/Users/mahib/CodingStuff/Projects/GENTT/build/CMakeFiles/main.dir
+/Users/mahib/CodingStuff/Projects/GENTT/build/CMakeFiles/edit_cache.dir
+/Users/mahib/CodingStuff/Projects/GENTT/build/CMakeFiles/rebuild_cache.dir
