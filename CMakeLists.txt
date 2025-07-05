@@ -14,12 +14,15 @@ file(GLOB SOURCES
   ${SRC_DIR}/main.cpp
 )
 
+include_directories(include)
+
+set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_executable(main 
   ${SOURCES}
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-target_include_directories(main PRIVATE include)
 
 # set(OPTS )
 
